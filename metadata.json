@@ -1,0 +1,6 @@
+{
+  "name": "Remix: PaletteAI",
+  "description": "An AI-powered theme generator and color design tool featuring image palette extraction, gradient generation, and accessibility testing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
