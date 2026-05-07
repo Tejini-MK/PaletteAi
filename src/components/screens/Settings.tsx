@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Settings as SettingsIcon, Save, Bell, Shield, Smartphone, Globe, Palette, Sun, Moon, Layers } from 'lucide-react';
+import { Settings as SettingsIcon, Save, Bell, Shield, Smartphone, Globe, Palette, Sun, Moon, Layers, Heart } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import confetti from 'canvas-confetti';
 import { useTheme } from '@/src/contexts/ThemeContext';
@@ -249,9 +249,10 @@ export default function Settings() {
                       </div>
                       <button 
                         onClick={() => unlikeGradient(gradient.name)}
-                        className="text-[var(--text-secondary)] hover:text-red-500 transition-colors"
+                        className="p-2 text-[var(--text-secondary)] hover:text-red-500 transition-all hover:scale-110 active:scale-90"
+                        title="Unlike"
                       >
-                        Unlike
+                        <Heart size={18} fill="currentColor" className="text-red-500" />
                       </button>
                     </div>
                   )) : (

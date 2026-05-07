@@ -10,7 +10,8 @@ import {
   Zap,
   Sun,
   Moon,
-  Beaker
+  Beaker,
+  Heart
 } from 'lucide-react';
 import { AppMode } from '@/src/types';
 import { cn } from '@/src/lib/utils';
@@ -135,9 +136,9 @@ export default function SideNavBar({ currentMode, setMode, isOpen, onClose }: Si
              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#a3a6ff] to-[#49339d] flex items-center justify-center font-black text-white shadow-xl group-hover:rotate-6 transition-transform">
                {userInitials}
              </div>
-             <div className="overflow-hidden">
-               <p className="text-xs font-black text-[var(--text-primary)] leading-none truncate w-24">{userName}</p>
-               <div className="flex items-center gap-1 mt-1">
+             <div className="flex flex-col min-w-0">
+               <p className="text-sm font-black text-[var(--text-primary)] truncate max-w-[100px]">{userName}</p>
+               <div className="flex items-center gap-1 mt-0.5">
                  <div className="w-1 h-1 rounded-full bg-[#a3a6ff]" />
                  <p className="text-[8px] font-black text-[#a3a6ff] uppercase tracking-widest">Founder Tier</p>
                </div>
