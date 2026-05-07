@@ -13,6 +13,8 @@ export default function GradientStudio() {
   const [selectedGradient, setSelectedGradient] = useState<AIGradient | null>(null);
   const [suggestions, setSuggestions] = useState<AIGradient[]>([]);
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [colorCount, setColorCount] = useState(3);
+  const [gradientStyle, setGradientStyle] = useState<'soft' | 'hard'>('soft');
 
   const handleLikeToggle = () => {
     if (!selectedGradient) return;
@@ -29,10 +31,12 @@ export default function GradientStudio() {
     }
   };
 
-  const handleRegenerate = async () => {
+  const handleRegenerate = async (countOverride?: number, styleOverride?: 'soft' | 'hard') => {
     setIsRegenerating(true);
+    const countToUse = countOverride || colorCount;
+    const styleToUse = styleOverride || gradientStyle;
     try {
-      const aiGradients = await generateAIGradients();
+      const aiGradients = await generateAIGradients(countToUse, styleToUse);
       if (aiGradients && aiGradients.length > 0) {
         setSuggestions(aiGradients);
         setSelectedGradient(aiGradients[0]);
@@ -75,12 +79,12 @@ export default function GradientStudio() {
         </div>
 
         <div className="w-full md:w-auto flex items-center gap-4 bg-[var(--bg-surface)] p-2 rounded-2xl border border-[var(--border-main)] shadow-xl justify-between md:justify-start">
-          <div className="flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-bold text-[var(--text-primary)] border-r border-[var(--border-main)]">
+          <div className="flex items-center gap-2 px-4 py-2 text-xs md:text-sm font-bold text-[var(--text-primary)]">
              <Layers size={18} className="text-[#a3a6ff]" />
              SaaS Platform
           </div>
           <button 
-            onClick={handleRegenerate}
+            onClick={() => handleRegenerate()}
             disabled={isRegenerating}
             className="flex-1 md:flex-none bg-gradient-to-br from-[#a3a6ff] to-[#49339d] text-white px-6 py-2 rounded-xl font-bold text-xs md:text-sm flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100"
           >
@@ -157,8 +161,71 @@ export default function GradientStudio() {
           </div>
         </motion.div>
 
-        {/* Suggestions */}
+        {/* Controls & Suggestions */}
         <div className="col-span-1 md:col-span-4 flex flex-col gap-6">
+          
+          {/* Configuration Cards */}
+          <div className="bg-[var(--bg-surface)] p-5 rounded-3xl border border-[var(--border-main)] shadow-xl space-y-5">
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)] block mb-3">Color Count</span>
+              <div className="flex gap-2">
+                {[2, 3, 4].map((num) => (
+                  <button
+                    key={num}
+                    onClick={() => {
+                      setColorCount(num);
+                      handleRegenerate(num, gradientStyle);
+                    }}
+                    className={cn(
+                      "flex-1 py-2 rounded-xl text-xs font-bold transition-all",
+                      colorCount === num 
+                        ? "bg-[#a3a6ff] text-white shadow-md shadow-[#a3a6ff]/20" 
+                        : "bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                    )}
+                  >
+                    {num}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-5 border-t border-[var(--border-main)]">
+              <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)] block mb-3">Blend Style</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    setGradientStyle('soft');
+                    handleRegenerate(colorCount, 'soft');
+                  }}
+                  className={cn(
+                    "flex-1 py-2 rounded-xl text-xs font-bold transition-all",
+                    gradientStyle === 'soft'
+                      ? "bg-[#a3a6ff] text-white shadow-md shadow-[#a3a6ff]/20" 
+                      : "bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                  )}
+                >
+                  Soft Blend
+                </button>
+                <button
+                  onClick={() => {
+                    setGradientStyle('hard');
+                    handleRegenerate(colorCount, 'hard');
+                  }}
+                  className={cn(
+                    "flex-1 py-2 rounded-xl text-xs font-bold transition-all",
+                    gradientStyle === 'hard'
+                      ? "bg-[#a3a6ff] text-white shadow-md shadow-[#a3a6ff]/20" 
+                      : "bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                  )}
+                >
+                  Hard Blend
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <span className="text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)] mt-2">AI Suggestions</span>
+          
           {suggestions.map((grad, i) => (
             <motion.div
               key={grad.name}

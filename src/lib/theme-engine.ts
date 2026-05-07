@@ -5,8 +5,17 @@ export function injectPreviewTheme(colors: { primary: string; secondary: string;
   root.style.setProperty('--preview-secondary', colors.secondary);
   root.style.setProperty('--preview-accent', colors.accent);
   
-  if (colors.background) root.style.setProperty('--preview-bg', colors.background);
-  if (colors.surface) root.style.setProperty('--preview-surface', colors.surface);
+  if (colors.background) {
+    root.style.setProperty('--preview-bg', colors.background);
+  } else {
+    root.style.setProperty('--preview-bg', 'var(--bg-app)');
+  }
+
+  if (colors.surface) {
+    root.style.setProperty('--preview-surface', colors.surface);
+  } else {
+    root.style.setProperty('--preview-surface', 'var(--bg-surface)');
+  }
   
   if (colors.gradients && colors.gradients.length > 0) {
     const gradientString = colors.gradients.length === 1 

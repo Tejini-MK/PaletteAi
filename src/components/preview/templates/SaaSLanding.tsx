@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Check, ArrowRight, Zap, Shield, Globe, BarChart3, Users, ZapOff } from 'lucide-react';
+import { cn } from '@/src/lib/utils';
 
 import { DeviceType } from '@/src/lib/store';
 
@@ -29,7 +30,7 @@ export default function SaaSLanding({ device }: { device?: DeviceType }) {
 
       {/* Hero */}
       <section className="relative px-8 py-24 text-center overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-10 blur-[120px] bg-[var(--preview-gradient)] rounded-full" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] -z-10 opacity-60 blur-[100px] rounded-full" style={{ backgroundImage: 'var(--preview-gradient)' }} />
         
         <motion.div 
           initial={{ opacity: 0, y: 20 }}

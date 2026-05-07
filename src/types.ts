@@ -19,6 +19,7 @@ export interface Gradient {
 export interface AIDetailedTheme {
   title: string;
   description: string;
+  recommendedMode?: 'light' | 'dark';
   colors: {
     primary: string;
     secondary: string;

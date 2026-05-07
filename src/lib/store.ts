@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 export type DeviceType = 'desktop' | 'tablet' | 'mobile';
 export type ThemeMode = 'light' | 'dark';
-export type TemplateType = 'SaaS' | 'Dashboard' | 'Portfolio' | 'Ecommerce' | 'AI Startup';
+export type TemplateType = 'SaaS' | 'Dashboard' | 'Portfolio' | 'Ecommerce' | 'AI Startup' | 'Mobile App';
 
 interface PreviewTheme {
   primary: string;

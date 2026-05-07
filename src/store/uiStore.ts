@@ -35,7 +35,7 @@ export const useUIStore = create<UIState>()(
 
       history: [],
       addToHistory: (newSet) => set((state) => {
-        const exists = state.history.some(s => s.name === newSet.name);
+        const exists = state.history.some(s => s.title === newSet.title);
         if (exists) return state;
         // Keep last 20 palettes
         const newHistory = [newSet, ...state.history].slice(0, 20);

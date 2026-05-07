@@ -30,7 +30,7 @@ const GEMINI_KEYS = [
 const GROQ_KEY = import.meta.env.VITE_GROQ_API_KEY;
 
 // MODEL CONFIGURATION (Using latest supported models)
-const GROQ_PRIMARY_MODEL = "llama-3.3-70b-versatile"; // Updated from decommissioned model
+const GROQ_PRIMARY_MODEL = "llama-3.3-70b-versatile"; 
 const GROQ_FAST_MODEL = "llama-3.1-8b-instant";
 const GEMINI_PRO_MODEL = "gemini-1.5-pro";
 const GEMINI_FLASH_MODEL = "gemini-1.5-flash";
@@ -40,12 +40,11 @@ let currentGeminiIndex = 0;
 // Initialize Providers
 const groq = GROQ_KEY ? new Groq({ apiKey: GROQ_KEY, dangerouslyAllowBrowser: true }) : null;
 
-async function getGeminiModel(modelName: string) {
+async function getGeminiClient() {
   if (GEMINI_KEYS.length === 0) return null;
   const key = GEMINI_KEYS[currentGeminiIndex];
   currentGeminiIndex = (currentGeminiIndex + 1) % GEMINI_KEYS.length;
-  const genAI = new GoogleGenAI(key);
-  return genAI.getGenerativeModel({ model: modelName });
+  return new GoogleGenAI({ apiKey: key });
 }
 
 /**
@@ -68,6 +67,7 @@ export async function generateDetailedTheme(prompt: string): Promise<AIDetailedT
             Return a JSON object exactly with these keys: 
             title (string), 
             description (catchy string), 
+            recommendedMode (string exactly "light" or "dark" based on what suits the colors best),
             colors (object with keys: primary, secondary, accent, background, surface as HEX strings), 
             rationale (string), 
             usage (object with keys: headings, body, buttons, cards as strings), 
@@ -85,16 +85,17 @@ export async function generateDetailedTheme(prompt: string): Promise<AIDetailedT
     }
   }
 
-  // Fallback to Gemini
-  const model = await getGeminiModel(GEMINI_PRO_MODEL);
-  if (!model) return null;
+  // Fallback to Gemini (New SDK Pattern)
+  const client = await getGeminiClient();
+  if (!client) return null;
 
   try {
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: `Generate a detailed design system theme for: ${prompt}. Return JSON.` }] }],
-      generationConfig: { responseMimeType: "application/json" }
+    const result = await client.models.generateContent({
+      model: GEMINI_PRO_MODEL,
+      contents: [{ role: "user", parts: [{ text: `Generate a detailed design system theme for: ${prompt}. Return JSON. Must include a "recommendedMode" key that is exactly "light" or "dark" based on what suits the colors best.` }] }],
+      config: { responseMimeType: "application/json" }
     });
-    return JSON.parse(result.response.text());
+    return JSON.parse(result.text || "{}");
   } catch (err) {
     console.error("AI Service Error:", err);
     return null;
@@ -123,26 +124,31 @@ export async function generateAIThemes(colorCount: number = 2): Promise<AIColorS
   }
 
   // Gemini Fallback
-  const model = await getGeminiModel(GEMINI_FLASH_MODEL);
-  if (!model) return [];
+  const client = await getGeminiClient();
+  if (!client) return [];
   try {
-    const result = await model.generateContent({
+    const result = await client.models.generateContent({
+      model: GEMINI_FLASH_MODEL,
       contents: [{ role: "user", parts: [{ text: `Generate 6 color sets with ${colorCount} colors as a JSON array.` }] }],
-      generationConfig: { responseMimeType: "application/json" }
+      config: { responseMimeType: "application/json" }
     });
-    return JSON.parse(result.response.text());
+    return JSON.parse(result.text || "[]");
   } catch (err) {
     console.error("Gemini Theme Fallback Error:", err);
     return [];
   }
 }
 
-export async function generateAIGradients(): Promise<AIGradient[]> {
+export async function generateAIGradients(colorCount: number = 3, gradientStyle: string = 'soft'): Promise<AIGradient[]> {
+  const styleInstruction = gradientStyle === 'hard' 
+    ? "The colors should have high contrast, bold saturation, and intense dynamic range." 
+    : "The colors should be smooth, pastel, analogous, or softly blended with low contrast.";
+
   if (groq) {
     try {
       const completion = await groq.chat.completions.create({
         messages: [
-          { role: "user", content: "Generate 3 premium gradients as a JSON object with a \"gradients\" array of {name, colors[]}." }
+          { role: "user", content: `Generate 3 premium gradients. Each gradient MUST have exactly ${colorCount} colors. ${styleInstruction} Return a JSON object with a "gradients" array. Each gradient object MUST have a "name" (string) and "colors" (array of HEX strings, e.g., ["#FF0000", "#0000FF"]).` }
         ],
         model: GROQ_FAST_MODEL,
         response_format: { type: "json_object" }
@@ -155,15 +161,16 @@ export async function generateAIGradients(): Promise<AIGradient[]> {
   }
 
   // Fallback to Gemini
-  const model = await getGeminiModel(GEMINI_FLASH_MODEL);
-  if (!model) return [];
+  const client = await getGeminiClient();
+  if (!client) return [];
   try {
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: "Generate 3 unique gradients as JSON array of {name, colors[]}." }] }],
-      generationConfig: { responseMimeType: "application/json" }
+    const result = await client.models.generateContent({
+      model: GEMINI_FLASH_MODEL,
+      contents: [{ role: "user", parts: [{ text: `Generate 3 unique gradients. Each gradient MUST have exactly ${colorCount} colors. ${styleInstruction} Return a JSON object with a "gradients" array. Each gradient object MUST have a "name" (string) and "colors" (array of HEX strings, e.g., ["#FF0000", "#0000FF"]).` }] }],
+      config: { responseMimeType: "application/json" }
     });
-    const parsed = JSON.parse(result.response.text());
-    return Array.isArray(parsed) ? parsed : [];
+    const parsed = JSON.parse(result.text || "{}");
+    return parsed.gradients || (Array.isArray(parsed) ? parsed : []);
   } catch (err) {
     console.error("AI Gradient Fallback Error:", err);
     return [];
@@ -174,11 +181,12 @@ export async function generateAIGradients(): Promise<AIGradient[]> {
  * IMAGE ANALYSIS (GEMINI VISION PREFERRED)
  */
 export async function analyzeImageMood(base64Image: string, mimeType: string): Promise<ImageMood | null> {
-  const model = await getGeminiModel(GEMINI_PRO_MODEL);
-  if (!model) return null;
+  const client = await getGeminiClient();
+  if (!client) return null;
 
   try {
-    const result = await model.generateContent({
+    const result = await client.models.generateContent({
+      model: GEMINI_PRO_MODEL,
       contents: [{
         role: "user",
         parts: [
@@ -186,9 +194,9 @@ export async function analyzeImageMood(base64Image: string, mimeType: string): P
           { inlineData: { data: base64Image, mimeType } }
         ]
       }],
-      generationConfig: { responseMimeType: "application/json" }
+      config: { responseMimeType: "application/json" }
     });
-    return JSON.parse(result.response.text());
+    return JSON.parse(result.text || "{}");
   } catch (err) {
     console.error("Gemini Vision Error:", err);
     return null;

@@ -19,7 +19,6 @@ import { useTheme } from '@/src/contexts/ThemeContext';
 import { useUser } from '@/src/contexts/UserContext';
 import { X } from 'lucide-react';
 
-import { StyleModeSelector } from './style-modes/StyleModeSelector';
 import { Sparkles } from 'lucide-react';
 
 interface SideNavBarProps {

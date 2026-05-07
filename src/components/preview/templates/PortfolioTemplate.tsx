@@ -24,11 +24,12 @@ export default function PortfolioTemplate({ device }: { device?: DeviceType }) {
       </header>
 
       {/* Hero */}
-      <section className="px-8 py-24 max-w-6xl mx-auto border-t border-[var(--border-main)]">
+      <section className="relative px-8 py-24 max-w-6xl mx-auto border-t border-[var(--border-main)] overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] -z-10 opacity-50 blur-[120px] rounded-full pointer-events-none" style={{ backgroundImage: 'var(--preview-gradient)' }} />
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="max-w-3xl space-y-8"
+          className="max-w-3xl space-y-8 relative z-10"
         >
           <h2 className={cn(
             "font-black tracking-tighter leading-[0.85]",

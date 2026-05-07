@@ -6,10 +6,13 @@ import { AIDetailedTheme } from '@/src/types';
 import { useDesignData } from '@/src/contexts/DesignDataContext';
 import { cn } from '@/src/lib/utils';
 import { useStyleModeStore } from '@/src/store/styleModeStore';
+import { usePreviewStore } from '@/src/lib/store';
 
 export default function BrandDNAEngine() {
   const { setActiveTheme } = useDesignData();
   const { setMode } = useStyleModeStore();
+  const openPreview = usePreviewStore(state => state.openPreview);
+  const setPreviewMode = usePreviewStore(state => state.setMode);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -193,10 +196,27 @@ export default function BrandDNAEngine() {
 
                 {/* Quick Actions */}
                 <div className="flex gap-4">
-                  <button className="flex-1 bg-[var(--bg-surface)] border border-[var(--border-main)] p-6 rounded-3xl flex items-center justify-between group hover:border-[#a3a6ff] transition-all">
+                  <button 
+                    onClick={() => {
+                      if (!result) return;
+                      const mappedTheme = {
+                        primary: result.colors.primary,
+                        accent: result.colors.accent,
+                        secondary: result.colors.secondary,
+                        onPrimary: '#ffffff',
+                        onSurface: result.colors.primary,
+                        primaryContainer: result.colors.primary + '20',
+                      };
+                      if (result.recommendedMode) {
+                        setPreviewMode(result.recommendedMode);
+                      }
+                      openPreview(mappedTheme);
+                    }}
+                    className="flex-1 bg-[var(--bg-surface)] border border-[var(--border-main)] p-6 rounded-3xl flex items-center justify-between group hover:border-[#a3a6ff] transition-all"
+                  >
                     <div>
                       <p className="text-[10px] font-black uppercase text-[var(--text-secondary)]">Next Step</p>
-                      <p className="font-black">Theme Playground</p>
+                      <p className="font-black">Live preview playground</p>
                     </div>
                     <ArrowRight className="group-hover:translate-x-2 transition-transform" />
                   </button>

@@ -26,6 +26,10 @@ interface LandingPageProps {
 }
 
 export default function LandingPage({ onStart }: LandingPageProps) {
+  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>, id: string) => {
+    e.preventDefault();
+    document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' });
+  };
   const features = [
     {
       title: 'AI Theme Engine',
@@ -98,8 +102,8 @@ export default function LandingPage({ onStart }: LandingPageProps) {
           </div>
           
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm font-medium text-white/60 hover:text-white transition-colors">Features</a>
-            <a href="#showcase" className="text-sm font-medium text-white/60 hover:text-white transition-colors">Showcase</a>
+            <a href="#features" onClick={(e) => scrollToSection(e, '#features')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Features</a>
+            <a href="#showcase" onClick={(e) => scrollToSection(e, '#showcase')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Showcase</a>
             <button onClick={() => onStart('Theme Generator')} className="text-sm font-medium text-white/60 hover:text-white transition-colors">Generator</button>
           </div>
 
@@ -161,7 +165,10 @@ export default function LandingPage({ onStart }: LandingPageProps) {
                 Dive Into Creativity
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </button>
-              <button className="px-8 py-4 bg-white/5 text-white border border-white/10 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-white/10 transition-all">
+              <button 
+                onClick={(e) => scrollToSection(e, '#features')}
+                className="px-8 py-4 bg-white/5 text-white border border-white/10 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-white/10 transition-all"
+              >
                 Explore Features
               </button>
             </motion.div>
@@ -363,10 +370,10 @@ export default function LandingPage({ onStart }: LandingPageProps) {
           <div className="space-y-6">
             <h4 className="text-[10px] font-black uppercase tracking-widest text-white/60">Product</h4>
             <ul className="space-y-4 text-xs font-bold text-white/40">
-              <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Live Showcase</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Design Tokens</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">API Docs</a></li>
+              <li><a href="#features" onClick={(e) => scrollToSection(e, '#features')} className="hover:text-white transition-colors">Features</a></li>
+              <li><a href="#showcase" onClick={(e) => scrollToSection(e, '#showcase')} className="hover:text-white transition-colors">Live Showcase</a></li>
+              <li><button onClick={() => onStart('Theme Generator')} className="hover:text-white transition-colors uppercase">Design Tokens</button></li>
+              <li><button onClick={() => onStart('Gradient AI')} className="hover:text-white transition-colors uppercase">API Docs</button></li>
             </ul>
           </div>
 
