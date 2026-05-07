@@ -100,14 +100,11 @@ export default function DashboardTemplate({ device }: { device?: DeviceType }) {
           </div>
         </header>
 
-        <div className={cn(
-          "p-8 grid gap-6",
-          isMobile ? "grid-cols-1" : isTablet ? "grid-cols-2" : "grid-cols-12"
-        )}>
+        <div className="p-8 flex flex-col gap-8">
           {/* Stats Grid */}
           <div className={cn(
             "grid gap-6",
-            isMobile ? "grid-cols-1" : isTablet ? "col-span-2 grid-cols-2" : "col-span-12 grid-cols-4"
+            isMobile ? "grid-cols-1" : isTablet ? "grid-cols-2" : "grid-cols-4"
           )}>
             {[
               { label: 'Total Revenue', value: '$128,430', growth: '+12.5%', up: true },
