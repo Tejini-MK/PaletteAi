@@ -32,8 +32,8 @@ const GROQ_KEY = import.meta.env.VITE_GROQ_API_KEY;
 // MODEL CONFIGURATION (Using latest supported models)
 const GROQ_PRIMARY_MODEL = "llama-3.3-70b-versatile"; 
 const GROQ_FAST_MODEL = "llama-3.1-8b-instant";
-const GEMINI_PRO_MODEL = "gemini-1.5-pro";
-const GEMINI_FLASH_MODEL = "gemini-1.5-flash";
+const GEMINI_PRO_MODEL = "gemini-2.5-pro";
+const GEMINI_FLASH_MODEL = "gemini-2.5-flash";
 
 let currentGeminiIndex = 0;
 
@@ -109,7 +109,7 @@ export async function generateAIThemes(colorCount: number = 2): Promise<AIColorS
         messages: [
           {
             role: "user",
-            content: `Generate 6 unique, professional SaaS design color sets. Each set MUST contain exactly ${colorCount} colors. Return JSON object with a "themes" array of objects with 'colors' (array) and 'name' (string).`
+            content: `Generate 6 unique, professional SaaS design color sets. Each set MUST contain exactly ${colorCount} colors. Return a JSON object with a "themes" array. Each theme object MUST have 'name' (string) and 'colors' (array of exactly ${colorCount} HEX strings). Output ONLY valid JSON.`
           }
         ],
         model: GROQ_PRIMARY_MODEL,
@@ -129,10 +129,11 @@ export async function generateAIThemes(colorCount: number = 2): Promise<AIColorS
   try {
     const result = await client.models.generateContent({
       model: GEMINI_FLASH_MODEL,
-      contents: [{ role: "user", parts: [{ text: `Generate 6 color sets with ${colorCount} colors as a JSON array.` }] }],
+      contents: [{ role: "user", parts: [{ text: `Generate 6 unique, professional SaaS design color sets. Each set MUST contain exactly ${colorCount} colors. Return a JSON object with a "themes" array. Each theme object MUST have 'name' (string) and 'colors' (array of exactly ${colorCount} HEX strings). Output ONLY valid JSON.` }] }],
       config: { responseMimeType: "application/json" }
     });
-    return JSON.parse(result.text || "[]");
+    const parsed = JSON.parse(result.text || "{}");
+    return parsed.themes || (Array.isArray(parsed) ? parsed : []);
   } catch (err) {
     console.error("Gemini Theme Fallback Error:", err);
     return [];
