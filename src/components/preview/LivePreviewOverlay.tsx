@@ -182,12 +182,10 @@ export default function LivePreviewOverlay() {
                   <button onClick={() => setShowExport(false)} className="p-2 text-white/40 hover:text-white transition-colors"><X size={24} /></button>
                 </div>
 
-                <div className="space-y-6">
+                <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-6">
                   {[
                     { id: 'tailwind', label: 'Tailwind Config', icon: Code2 },
-                    { id: 'css', label: 'CSS Variables', icon: Terminal },
-                    { id: 'flutter', label: 'Flutter Theme', icon: Smartphone },
-                    { id: 'json', label: 'JSON Object', icon: Copy }
+                    { id: 'css', label: 'CSS Variables', icon: Terminal }
                   ].map((exp) => (
                     <div key={exp.id} className="p-6 rounded-2xl bg-white/5 border border-white/5 space-y-4">
                       <div className="flex justify-between items-center">
